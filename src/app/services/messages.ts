@@ -1,16 +1,21 @@
 /*
  * The Interfaces of the chat protocol messages
  */
- 
+
+export type MessageType = 
+	'login-req' | 'list-rooms-req' | 'join-room-req' | 'leave-room-req' | 'say-req' | 'whisper-req' | 
+	'login-res' | 'list-rooms-res' | 'join-room-res' | 'leave-room-res' | 'say-res' | 'whisper-res' |
+	'room-chat-feed' | 'people-feed' | 'whisper-feed';
+
 export interface Message {
 	id?: string;
-	type: string;
+	type: MessageType;
 	payload: Payload;
 }
 
 export type Payload = LoginRequestPayload | ResponseStatusPayload | WhisperRequestPayload | SayRequestPayload
 					| LeaveRoomRequestPayload | JoinRoomRequestPayload | ListRoomsRequestPayload | ListRoomsResponsePayload
-					| WhisperFeedPayload | RoomChatFeedPayload | RoomUserFeedPayload;
+					| WhisperFeedPayload | RoomChatFeedPayload | PeopleFeedPayload;
 
 export interface WhisperRequestPayload {
 	to: string;
@@ -59,11 +64,11 @@ export interface RoomChatFeedPayload {
     room: string;
 }
 
-export type RoomUserAction = "JOINED ROOM" | "LEFT ROOM";
+export type PeopleAction = "JOINED ROOM" | "LEFT ROOM";
 
-export interface RoomUserFeedPayload {
+export interface PeopleFeedPayload {
 	who: string;
-	action: RoomUserAction;
+	action: PeopleAction;
 	room: string;
 }
 
