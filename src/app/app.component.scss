@@ -1,0 +1,50 @@
+$padding: 10px;
+$font-family-stack: 'Inconsolata', monospace;
+$back-color: #444;
+$main-txt-color: #eee;
+$brand-color: #ff0072;
+$commands-color: #0bf;
+
+* {
+	background-color: $back-color;
+	color: $main-txt-color;
+}
+
+#chatpane {
+	box-sizing: border-box;
+	padding: $padding;
+	width: 99.7%;
+	height: 80%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	overflow-y: scroll;
+
+	.msg {
+		.from {
+			box-sizing: border-box;
+			color: $brand-color;
+		}
+	}
+
+	.command {
+		.cmd-name {
+			color: $commands-color;
+		}
+		color: $commands-color;
+	}
+
+}
+
+#cmdline {
+	border: 0;
+	border-top: 4px solid #666;
+	box-sizing: border-box;
+	padding: $padding;
+	height: 20%;
+	width: 99.7%;
+	font-family: $font-family-stack;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+}
