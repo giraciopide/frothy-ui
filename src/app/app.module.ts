@@ -2,9 +2,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-
-import { MdSidenavModule } from '@angular/material';
 import { AppComponent } from './app.component';
+
+// services
+import { LoggingService } from './services/logging/logging.service';
 
 @NgModule({
   declarations: [
@@ -13,10 +14,11 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
-    MdSidenavModule
+    HttpModule
   ],
-  providers: [],
+  providers: [
+    LoggingService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
