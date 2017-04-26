@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 
 // services
 import { LoggingService } from './services/logging/logging.service';
+import { ChatCliService } from './services/cmdline/commandline.service';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { LoggingService } from './services/logging/logging.service';
     HttpModule
   ],
   providers: [
-    LoggingService
+    LoggingService,
+    ChatCliService
   ],
   bootstrap: [AppComponent]
 })
