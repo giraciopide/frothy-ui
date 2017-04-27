@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Message } from '../messages';
+import { LoggingService, Logger } from '../logging/logging.service';
 
 export type Command = '/join' | '/j' | '/leave' | '/whisper' | '/w' | '/say' | '/s' | '/login';
 
 @Injectable()
 export class ChatCliService {
 
-    constructor() { }
+    private log: Logger;
+
+    constructor(logFactory: LoggingService) { 
+        this.log = logFactory.getLogger('chat-cli-service');
+    }
 
     /**
     * Parse text and returns the correspondent message to be sent to the backend.
     * @returns null if the text is not a valid command and cannot be parsed. 
     */
-    parseCommandLine(text: string, currentRoom: string): Message {
+    parse(text: string, currentRoom?: string): Message {
         let t = text.trim();
         let message: Message = null;
 
@@ -47,12 +52,21 @@ export class ChatCliService {
         return message;
     }
 
+    // split('a b c d', 2 ) should return ['a', 'b', 'c d']
     private split(text: string, limit: number): string[] {
-        return text.split(/(\s+)/, limit);
+        // we split on limit - 1
+        let head: string[] = text.split(/\s+/, limit - 1);
+        let lastHeadToken = head[head.length - 1];
+        let headLastChar = text.indexOf(lastHeadToken) + lastHeadToken.length;
+        let tail = text.substring(headLastChar).trim(); // trim is important here.
+        // let's just reuse head to return the pieces
+        head.push(tail);
+        return head;
     }
 
     private parseCommand(text: string): Command {
         let pieces = this.split(text, 2);
+        this.log.info(JSON.stringify(pieces));
         return pieces[0] as Command;
     }
 
@@ -61,6 +75,7 @@ export class ChatCliService {
      */
     private parseJoinRoomCmd(t: string): Message {
         let p = this.split(t, 2 + 1);
+        this.log.info(JSON.stringify(p));
         let roomName = p[1];
         return {
             type: 'join-room-req',
@@ -75,6 +90,7 @@ export class ChatCliService {
      */
     private parseLeaveRoomCmd(t: string): Message {
         let p = this.split(t, 2 + 1);
+        this.log.info(JSON.stringify(p));
         let roomName = p[1];
         return {
             type: 'leave-room-req',
@@ -89,6 +105,7 @@ export class ChatCliService {
      */
     private parseWhisperCmd(t: string): Message {
         let p = this.split(t, 2 + 1);
+        this.log.info(JSON.stringify(p));
         let to = p[1];
         let whisper = p[2];
         return {
@@ -105,6 +122,7 @@ export class ChatCliService {
      */
     private parseSayCmd(t: string): Message {
         let p = this.split(t, 2 + 1);
+        this.log.info(JSON.stringify(p));
         let room = p[1];
         let msg = p[2];
         return {
@@ -121,6 +139,7 @@ export class ChatCliService {
      */
     private parseLoginCmd(t: string): Message {
         let p = this.split(t, 2 + 1);
+        this.log.info(JSON.stringify(p));
         let nick = p[1];
         return {
             type: 'login-req',
