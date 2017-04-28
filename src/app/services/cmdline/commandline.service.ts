@@ -4,6 +4,32 @@ import { LoggingService, Logger } from '../logging/logging.service';
 
 export type Command = '/join' | '/j' | '/leave' | '/whisper' | '/w' | '/say' | '/s' | '/login';
 
+export interface CliCommand {
+    type: Command    
+}
+
+export interface LoginCliCommand extends CliCommand {
+    nick: string;
+}
+
+export interface JoinRoomCliCommand extends CliCommand {
+    room: string;
+}
+
+export interface LeaveRoomCliCommand extends CliCommand {
+    room: string;
+}
+
+export interface WhisperCliCommand extends CliCommand {
+    to: string;
+    msg: string;
+}
+
+export interface SayCliCommand extends CliCommand {
+    room: string;
+    msg: string;
+}
+
 @Injectable()
 export class ChatCliService {
 
@@ -17,30 +43,30 @@ export class ChatCliService {
     * Parse text and returns the correspondent message to be sent to the backend.
     * @returns null if the text is not a valid command and cannot be parsed. 
     */
-    parse(text: string, currentRoom?: string): Message {
+    parse(text: string, currentRoom?: string): CliCommand {
         let t = text.trim();
-        let message: Message = null;
+        let cliCmd: CliCommand = null;
 
         if (t.startsWith('/')) {
             let command: Command = this.parseCommand(t);
             switch (command) {
                 case '/j':
                 case '/join':
-                    message = this.parseJoinRoomCmd(t);
+                    cliCmd = this.parseJoinRoomCmd(t);
                     break;
                 case '/leave':
-                    message = this.parseLeaveRoomCmd(t);
+                    cliCmd = this.parseLeaveRoomCmd(t);
                     break;
                 case '/whisper':
                 case '/w':
-                    message = this.parseWhisperCmd(t);
+                    cliCmd = this.parseWhisperCmd(t);
                     break;
                 case '/say':
                 case '/s':
-                    message = this.parseSayCmd(t);
+                    cliCmd = this.parseSayCmd(t);
                     break;
                 case '/login':
-                    message = this.parseLoginCmd(t);
+                    cliCmd = this.parseLoginCmd(t);
                     break;
            
                 default: {
@@ -49,7 +75,7 @@ export class ChatCliService {
             }
 
         } 
-        return message;
+        return cliCmd;
     }
 
     // split('a b c d', 2 ) should return ['a', 'b', 'c d']
@@ -73,79 +99,140 @@ export class ChatCliService {
     /**
      * Parses comd like: /join room_name
      */
-    private parseJoinRoomCmd(t: string): Message {
+    private parseJoinRoomCmd(t: string): JoinRoomCliCommand {
         let p = this.split(t, 2 + 1);
         this.log.info(JSON.stringify(p));
         let roomName = p[1];
         return {
-            type: 'join-room-req',
-            payload: {
-                room: roomName
-            }
-        };
+            type: '/join',
+            room: roomName
+        }
     }
 
     /**
      * Parses comd like: /leave room_name
      */
-    private parseLeaveRoomCmd(t: string): Message {
+    private parseLeaveRoomCmd(t: string): LeaveRoomCliCommand {
         let p = this.split(t, 2 + 1);
         this.log.info(JSON.stringify(p));
         let roomName = p[1];
         return {
-            type: 'leave-room-req',
-            payload: {
-                room: roomName
-            }
-        };
+            type: '/leave',
+            room: roomName
+        }
     }
 
     /**
      * Parses comd like: /w my_secret_crush I love you!
      */
-    private parseWhisperCmd(t: string): Message {
+    private parseWhisperCmd(t: string): WhisperCliCommand {
         let p = this.split(t, 2 + 1);
         this.log.info(JSON.stringify(p));
         let to = p[1];
         let whisper = p[2];
         return {
-            type: 'whisper-req',
-            payload: {
-                to: to,
-                msg: whisper            
-            }
-        };
+            type: '/whisper',
+            to: to,
+            msg: whisper
+        }
     }
 
     /**
      * Parses cmd like: /say room-name Hello chaps!
      */
-    private parseSayCmd(t: string): Message {
+    private parseSayCmd(t: string): SayCliCommand {
         let p = this.split(t, 2 + 1);
         this.log.info(JSON.stringify(p));
         let room = p[1];
         let msg = p[2];
         return {
-            type: 'say-req',
-            payload: {
-                room: room,
-                msg: msg           
-            }
-        };
+            type: '/say',
+            room: room,
+            msg: msg
+        }
     }
 
     /**
      * Parses cmd like: /login badassNickNameOfDeath
      */
-    private parseLoginCmd(t: string): Message {
+    private parseLoginCmd(t: string): LoginCliCommand {
         let p = this.split(t, 2 + 1);
         this.log.info(JSON.stringify(p));
         let nick = p[1];
         return {
-            type: 'login-req',
-            payload: {
-                nick: nick     
+            type: '/login',
+            nick: nick
+        }
+    }
+
+    //
+    // To message
+    //
+    // 
+    //
+    //
+
+    public static asMessage(cmd: CliCommand): Message {
+        switch (cmd.type) {
+
+            case '/join':
+            case '/j': {
+                let c = cmd as JoinRoomCliCommand;
+                return {
+                    type: 'join-room-req',
+                    payload: {
+                        room: c.room
+                    }
+                };
             }
-        };
+
+            case '/leave': {
+                let c = cmd as LeaveRoomCliCommand;
+                return {
+                    type: 'leave-room-req',
+                    payload: {
+                        room: c.room
+                    }
+                };
+            }
+
+            case '/whisper':
+            case '/w': {
+                let c = cmd as WhisperCliCommand;
+                return {
+                    type: 'whisper-req',
+                    payload: {
+                        to: c.to,
+                        msg: c.msg
+                    }
+                };      
+            }
+
+            case '/say':
+            case '/s': {
+                let c = cmd as SayCliCommand;
+                return {
+                    type: 'say-req',
+                    payload: {
+                        room: c.room,
+                        msg: c.msg           
+                    }
+                };
+            }
+                
+            case '/login': {
+                let c = cmd as LoginCliCommand;
+                return {
+                    type: 'login-req',
+                    payload: {
+                        nick: c.nick     
+                    }
+                };
+            }
+
+            default:
+                return null;
+        }
+
     }
 }

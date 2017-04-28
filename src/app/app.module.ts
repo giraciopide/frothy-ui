@@ -7,6 +7,8 @@ import { AppComponent } from './app.component';
 // services
 import { LoggingService } from './services/logging/logging.service';
 import { ChatCliService } from './services/cmdline/commandline.service';
+import { BackendConnectionService } from './services/backend/connection/backend-connection.service';
+import { ChatService } from './services/backend/chat/chat.service';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,9 @@ import { ChatCliService } from './services/cmdline/commandline.service';
   ],
   providers: [
     LoggingService,
-    ChatCliService
+    ChatCliService,
+    BackendConnectionService, 
+    ChatService
   ],
   bootstrap: [AppComponent]
 })

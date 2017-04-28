@@ -18,7 +18,7 @@ $commands-color: #0bf;
 	position: fixed;
 	left: 0;
 	top: 0;
-	overflow: scroll;
+	overflow-y: scroll;
 
 	.msg {
 		.from {
