@@ -27,6 +27,8 @@ type RequestMap = { [key: string]: PendingRequest; };
 @Injectable()
 export class BackendConnectionService {
 
+    private onOpenDelay: number = 500; // milliseconds to delay connection.
+
     private log: Logger;
     // used to auto-generate message ids.
     private nextId: number = 0;
@@ -53,7 +55,7 @@ export class BackendConnectionService {
         return 'ws://' + window.location.hostname + ':' + 8349 + '/chat';
     }
 
-        /**
+    /**
      * Returns a promise that will be resolved when the websocket will be open.
      * Called only when we have already retrieved the url where to connect to.
      */
@@ -67,15 +69,20 @@ export class BackendConnectionService {
         this.socket = new WebSocket(wsUrl);
         this.connectionStatusSubject.next(ConnectionStatus.OPENING);
         this.socketOpenPromise = new Promise((resolve, reject) => {
-            this.socket.onopen = (event) => {
+
+            let onOpen = (event) => {
                 this.log.info('connected to [' + wsUrl + ']');
                 resolve(this); //
                 this.connectionStatusSubject.next(ConnectionStatus.OPEN);
-            };
-
-            this.socket.onerror = (event) => {
-                this.log.info('ws [connection] error [' + event + ']')
             }
+
+            // FIXME just wait some time after connection to send the first message.
+            // the server implementation might lose a frame if sent immediately after login.
+            let delayedOnOpen = (event) => {
+                setTimeout(() => { onOpen(event); }, this.onOpenDelay);
+            }
+
+            this.socket.onopen = delayedOnOpen;
 
             this.socket.onclose = (event) => {
                 this.log.info('ws [connection] closed [' + event + ']');
@@ -90,6 +97,10 @@ export class BackendConnectionService {
                 this.rejectPendingRequests(this.pendingRequestsById, 'connection to [' + wsUrl + '] went down with event [' + JSON.stringify(event) + ']');
             }
         });
+
+        this.socket.onerror = (event) => {
+            this.log.info('ws [connection] error [' + event + ']')
+        }
 
         this.socket.onmessage = (event) => {
             let msg = JSON.parse(event.data);
