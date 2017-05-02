@@ -55,6 +55,7 @@ export interface JoinRoomRequestPayload {
 }
 
 export interface ListRoomsRequestPayload {
+	filter: string;
 }
 
 export interface LoginRequestPayload {

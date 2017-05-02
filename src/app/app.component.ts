@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ElementRef, HostListener, Input } from '@angular/core';
-import { ChatCliService, CliCommand, LoginCliCommand, JoinRoomCliCommand, LeaveRoomCliCommand, WhisperCliCommand, SayCliCommand } from './services/cmdline/commandline.service';
+import { ChatCliService, CliCommand, LoginCliCommand, JoinRoomCliCommand, LeaveRoomCliCommand, WhisperCliCommand, SayCliCommand, ListRoomsCliCommand } from './services/cmdline/commandline.service';
 import { ChatService, RoomInfo } from './services/backend/chat/chat.service';
 import { ChatItem, RoomTalkItem, WhisperOutItem, WhisperInItem, NoticeItem } from './model/chat-items';
 import { Message, Payload, WhisperFeedPayload, RoomChatFeedPayload, PeopleFeedPayload } from './services/messages';
@@ -92,6 +92,10 @@ export class AppComponent {
                 case '/login':
                     this.onLoginCmd(cmd as LoginCliCommand);
                     break;
+                case '/rooms':
+                    this.onListRoomsCmd(cmd as ListRoomsCliCommand);
+                    break;
+
                 default: {
 
                     // unrecognized command
@@ -147,9 +151,24 @@ export class AppComponent {
         this.chat.login(cmd.nick)
         .then(() => {
             this.addChatNoticeItem('you are now logged in as [' + cmd.nick + '] have fun, but respect other\'s feelings.');
+            this.cmdHint = 'join a room with \'/j room-name\', or list the available rooms with \'/rooms\'';
         })
         .catch((e: Error) => {
             this.addChatNoticeItem('could not log in as [' + cmd.nick + ']: [' + e.message + ']');
+        });
+    }
+
+    private onListRoomsCmd(cmd: ListRoomsCliCommand) {
+        this.chat.listRooms(cmd.filter)
+        .then((rooms: string[]) => {
+            this.addChatNoticeItem('found [' + rooms.length + '] rooms');
+            rooms.forEach((room: string, i: number) => {
+                this.addChatNoticeItem(i + '. ' + room);
+            });
+            this.cmdHint = 'join a room with \'/j room-name\', or list the available rooms with \'/rooms\'';
+        })
+        .catch((e: Error) => {
+            this.addChatNoticeItem('could not perform room listing: [' + e.message + ']');
         });
     }
 

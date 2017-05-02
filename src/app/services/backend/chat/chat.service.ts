@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BackendConnectionService } from '../connection/backend-connection.service';
 import { ChatCliService } from '../../cmdline/commandline.service';
-import { Message, JoinRoomResponsePayload } from '../../messages';
+import { Message, JoinRoomResponsePayload, ListRoomsResponsePayload } from '../../messages';
 import { Observable } from 'rxjs/Observable';
 
 export interface RoomInfo {
@@ -75,6 +75,18 @@ export class ChatService {
             }
         }).then((m: Message) => {
             return Promise.resolve();
+        });
+    }
+
+    listRooms(filter: string): Promise<string[]> {
+        return this.backend.send({
+            type: 'list-rooms-req',
+            payload: {
+                filter: filter
+            }
+        }).then((m: Message) => {
+            let p = m.payload as ListRoomsResponsePayload;
+            return Promise.resolve(p.rooms);
         });
     }
 

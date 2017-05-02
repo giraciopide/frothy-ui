@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Message } from '../messages';
 import { LoggingService, Logger } from '../logging/logging.service';
 
-export type Command = '/join' | '/j' | '/leave' | '/whisper' | '/w' | '/say' | '/s' | '/login';
+export type Command = '/join' | '/j' | '/leave' | '/whisper' | '/w' | '/say' | '/s' | '/login' | '/rooms';
 
 export interface CliCommand {
     type: Command    
@@ -28,6 +28,10 @@ export interface WhisperCliCommand extends CliCommand {
 export interface SayCliCommand extends CliCommand {
     room: string;
     msg: string;
+}
+
+export interface ListRoomsCliCommand extends CliCommand {
+    filter: string;
 }
 
 @Injectable()
@@ -68,6 +72,8 @@ export class ChatCliService {
                 case '/login':
                     cliCmd = this.parseLoginCmd(t);
                     break;
+                case '/rooms':
+                    cliCmd = this.parseListRoomsCmd(t);
            
                 default: {
                     // do nothing, message will remain null.
@@ -162,6 +168,19 @@ export class ChatCliService {
         return {
             type: '/login',
             nick: nick
+        }
+    }
+
+    /**
+     * Parses cmd like: /rooms sometextfilter or /rooms
+     */
+    private parseListRoomsCmd(t: string): ListRoomsCliCommand {
+        let p = this.split(t, 2 + 1);
+        this.log.info(JSON.stringify(p));
+        let filter = p[1] ? p[1] : null;
+        return {
+            type: '/rooms',
+            filter: filter // might be null
         }
     }
 }
