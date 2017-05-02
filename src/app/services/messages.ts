@@ -2,10 +2,11 @@
  * The Interfaces of the chat protocol messages
  */
 
-export type MessageType = 
-	'login-req' | 'list-rooms-req' | 'join-room-req' | 'leave-room-req' | 'say-req' | 'whisper-req' | 
-	'login-res' | 'list-rooms-res' | 'join-room-res' | 'leave-room-res' | 'say-res' | 'whisper-res' |
-	'room-chat-feed' | 'people-feed' | 'whisper-feed';
+export type RequestMessageType = 'login-req' | 'list-rooms-req' | 'join-room-req' | 'leave-room-req' | 'say-req' | 'whisper-req';
+export type ResponseMessageType = 'login-res' | 'list-rooms-res' | 'join-room-res' | 'leave-room-res' | 'say-res' | 'whisper-res';
+export type FeedMessageType = 'room-chat-feed' | 'people-feed' | 'whisper-feed';
+
+export type MessageType = RequestMessageType | ResponseMessageType | FeedMessageType;
 
 export type MessageCategory = 'request' | 'response' | 'feed' | 'unknown';
 
@@ -31,10 +32,6 @@ export interface Message {
 	type: MessageType;
 	payload: Payload;
 }
-
-export type Payload = LoginRequestPayload | WhisperRequestPayload | SayRequestPayload| LeaveRoomRequestPayload | JoinRoomRequestPayload | ListRoomsRequestPayload 
-					| ResponsePayload | ListRoomsResponsePayload | JoinRoomResponsePayload
-					| WhisperFeedPayload | RoomChatFeedPayload | PeopleFeedPayload;
 
 //
 // Reqs
@@ -67,7 +64,7 @@ export interface LoginRequestPayload {
 //
 // Responses
 //
-export type ResponseStatus = "OK" | "KO";
+export type ResponseStatus = "ok" | "ko";
 
 export interface ResponsePayload {
 	status: ResponseStatus;
@@ -98,10 +95,12 @@ export interface RoomChatFeedPayload {
     room: string;
 }
 
-export type PeopleAction = "JOINED ROOM" | "LEFT ROOM";
-
 export interface PeopleFeedPayload {
 	who: string;
-	action: PeopleAction;
+	action: string;
 	room: string;
 }
+
+export type Payload = LoginRequestPayload | WhisperRequestPayload | SayRequestPayload| LeaveRoomRequestPayload | JoinRoomRequestPayload | ListRoomsRequestPayload 
+					| ResponsePayload | ListRoomsResponsePayload | JoinRoomResponsePayload
+					| WhisperFeedPayload | RoomChatFeedPayload | PeopleFeedPayload;

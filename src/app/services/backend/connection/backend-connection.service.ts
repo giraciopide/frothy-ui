@@ -50,7 +50,7 @@ export class BackendConnectionService {
     }
 
     private discoverBackendUrl(): string {
-        return window.location + ':' + 8349
+        return 'ws://' + window.location.hostname + ':' + 8349 + '/chat';
     }
 
         /**
@@ -82,11 +82,11 @@ export class BackendConnectionService {
                 this.socket = null;
                 this.socketOpenPromise = null;
 
-                reject(this); // rejects the open connection promise
+                reject(new Error('connection was closed: ' + event.code + '/' + event.reason)); // rejects the open connection promise
                 this.connectionStatusSubject.next(ConnectionStatus.CLOSED); // notify status closed
 
                 // reject all pending requests and their promises with
-                this.log.trace('rejecing all pending request');
+                this.log.trace('rejecting all pending request');
                 this.rejectPendingRequests(this.pendingRequestsById, 'connection to [' + wsUrl + '] went down with event [' + JSON.stringify(event) + ']');
             }
         });
@@ -191,10 +191,10 @@ export class BackendConnectionService {
         if (request) {
             let payload: ResponsePayload = msg.payload as ResponsePayload;
             switch (payload.status) {
-                case 'OK': 
+                case 'ok': 
                     request.resolve(msg);
                     break;
-                case 'KO':
+                case 'ko':
                     let why: string = (payload.why ? payload.why : "no details why request failed");
                     request.reject(new Error(why));
                     break;

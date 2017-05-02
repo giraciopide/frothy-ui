@@ -1,12 +1,23 @@
 <div class="container">
   <ul id="chatpane">
-  	<li class='command'>---<[ Welcome to undercover ]>---</li>
-  	<li class='msg'><span class='from'>morgante</span>: uè che figata sta chat</li>
-  	<li class='msg'><span class='from'>jennifer</span>: si è davvero figha</li>
-  	<li class='command'><span class='cmd-name'>users in room</span>: jennifer, morgante</li>
-  	<li class='msg'><span class='from'>morgante</span>: uè che figata sta chat</li>
-  	<li class='msg'><span class='from'>jennifer</span>: si è davvero figha</li>
-  	<li class='command'><span class='cmd-name'>users in room</span>: jennifer, morgante</li>
+    <li class='welcome'>---===<[ ... welcome to undercover ... ]>===---</li>
+    <li *ngFor="let item of chatItems" class='chat-item'>
+      <div *ngIf="item.type == 'notice'" class='notice'>
+        <span class='notice'>notice:</span> <span class='notice-text'>{{ item.text }}</span>
+      </div>
+
+      <div *ngIf="item.type == 'room-talk'" class='room-talk'>
+        <span class='room'>{{ item.room }}</span>::<span class='who'>{{ item.who }}</span> <span class='msg'>{{ item.msg }}</span>
+      </div>
+
+      <div *ngIf="item.type == 'whisper-in'" class='whisper-in'>
+        <span class='who'>{{ item.from }}</span> <span class='whispers'>(whispers):</span> <span class='msg'>{{ item.msg }}</span>
+      </div>
+
+      <div *ngIf="item.type == 'whisper-out'" class='whisper-out'>
+        <span class='who'>you</span> <span class='whispers'>whisper to</span> <span class='who'>{{ item.to }}</span> <span class='msg'>{{ item.msg }}</span>
+      </div>
+    </li>
   </ul>
 
   <textarea [(ngModel)]=cmdText id="cmdline" placeholder='{{ cmdHint }}'></textarea>
