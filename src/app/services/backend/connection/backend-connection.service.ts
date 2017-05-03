@@ -3,9 +3,12 @@ import { LoggingService, Logger } from '../../logging/logging.service';
 import { Message, MessageCategory, Messages, ResponsePayload } from '../../messages';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/operator/takeWhile';
+import 'rxjs/add/operator/withLatestFrom';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
-declare var window: any;
+declare var window: any; // for auto discovering the url
 
 export enum ConnectionStatus {
     OPENING,
@@ -28,6 +31,8 @@ type RequestMap = { [key: string]: PendingRequest; };
 export class BackendConnectionService {
 
     private onOpenDelay: number = 500; // milliseconds to delay connection.
+    private pingInterval: number = 60 * 1000; // in milliseconds
+    private backendPort: number = 8349;
 
     private log: Logger;
     // used to auto-generate message ids.
@@ -52,7 +57,7 @@ export class BackendConnectionService {
     }
 
     private discoverBackendUrl(): string {
-        return 'ws://' + window.location.hostname + ':' + 8349 + '/chat';
+        return 'ws://' + window.location.hostname + ':' + this.backendPort + '/chat';
     }
 
     /**
@@ -74,6 +79,7 @@ export class BackendConnectionService {
                 this.log.info('connected to [' + wsUrl + ']');
                 resolve(this); //
                 this.connectionStatusSubject.next(ConnectionStatus.OPEN);
+                this.pingWhileOpen(this.pingInterval);
             }
 
             // FIXME just wait some time after connection to send the first message.
@@ -109,6 +115,31 @@ export class BackendConnectionService {
 
         // finally returning the socket open promisse
         return this.socketOpenPromise;
+    }
+
+    private pingWhileOpen(interval: number) {
+        // Setup ping and stop sending until when we disconnect
+        let pingStream = Observable
+            .interval(interval) // every interval millis.
+            .withLatestFrom(
+                this.getConnectionStatus(), 
+                (i: number, status: ConnectionStatus) => { 
+                    return status; 
+                })
+            .takeWhile( // stop pinging if we disconnect.
+                (status: ConnectionStatus) => { 
+                    return status == ConnectionStatus.OPEN; 
+                }) 
+            .subscribe(
+                (status: ConnectionStatus) => {
+                    let ping: Message = {
+                        type: 'ping-req',
+                        payload: {}
+                    }
+                    this.send(ping).catch((e: Error) => {
+                        this.log.error('could not ping/pong: [' + e.message + ']');
+                    });
+                });
     }
 
     /**
@@ -202,7 +233,7 @@ export class BackendConnectionService {
         if (request) {
             let payload: ResponsePayload = msg.payload as ResponsePayload;
             switch (payload.status) {
-                case 'ok': 
+                case 'ok':
                     request.resolve(msg);
                     break;
                 case 'ko':
