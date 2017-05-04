@@ -37,6 +37,9 @@ export class AppComponent {
         if (this.isCtrlEnter(event)) {
             this.onCommandSubmit(this.cmdText);
             this.cmdText = null; // reset the cmd line text
+        } else if (this.isTab(event)) {
+            this.onAutoCompleteCommand(this.cmdText);
+            event.stopPropagation();
         }
     }
 
@@ -51,6 +54,14 @@ export class AppComponent {
     // 
     private isCtrlEnter(event: KeyboardEvent) {
         return (event.ctrlKey && event.key == 'Enter');
+    }
+
+    private isTab(event: KeyboardEvent) {
+        return (event.key == 'Tab');
+    }
+
+    private onAutoCompleteCommand(commandText: string) {
+        this.log.info('Pressed tab...');
     }
 
     private onCommandSubmit(text: string) {
@@ -210,7 +221,6 @@ export class AppComponent {
             from: payload.from,
             msg: payload.whisper
         }
-        console.log("XXXX" + JSON.stringify(item));
         this.addChatItem(item);
     }
 

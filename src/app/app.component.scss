@@ -1,9 +1,20 @@
 $padding: 10px;
 $font-family-stack: 'Inconsolata', monospace;
+
+
+/* Colors */
 $back-color: #444;
-$main-txt-color: #eee;
+$main-txt-color: #b9b9b9;
 $brand-color: #ff0072;
-$commands-color: #0bf;
+
+$notice-txt-color: $main-txt-color;
+$whisper-txt-color: $brand-color;
+$whisper-who-color: $brand-color;
+$room-txt-color: #eee;
+$room-room-txt-color: #ff6600;
+$room-who-txt-color: $brand-color;
+
+
 
 * {
 	background-color: $back-color;
@@ -20,18 +31,36 @@ $commands-color: #0bf;
 	top: 0;
 	overflow-y: scroll;
 
-	.msg {
-		.from {
-			box-sizing: border-box;
-			color: $brand-color;
-		}
-	}
+	.chat-item {
+		color: $main-txt-color;
 
-	.command {
-		.cmd-name {
-			color: $commands-color;
+		.notice {
+			.notice-text {
+				color: $notice-txt-color;
+			}
 		}
-		color: $commands-color;
+
+		.room-talk {
+			.room {
+				color: $room-room-txt-color;
+			}
+			.who {
+				color: $room-who-txt-color;
+			}
+			.msg {
+				color: $room-txt-color;
+			}
+		}
+
+		.whisper-in, .whisper-out {
+			.msg {
+				color: $whisper-txt-color;
+			}
+			
+			.who {
+				color: $whisper-who-color;
+			}
+		}
 	}
 
 }

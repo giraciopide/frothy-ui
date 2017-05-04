@@ -7,7 +7,7 @@
       </div>
 
       <div *ngIf="item.type == 'room-talk'" class='room-talk'>
-        <span class='room'>{{ item.room }}</span>::<span class='who'>{{ item.who }}</span> <span class='msg'>{{ item.msg }}</span>
+        <span class='room'>{{ item.room }}</span>:<span class='who'>{{ item.who }}</span>: <span class='msg'>{{ item.msg }}</span>
       </div>
 
       <div *ngIf="item.type == 'whisper-in'" class='whisper-in'>
@@ -15,10 +15,10 @@
       </div>
 
       <div *ngIf="item.type == 'whisper-out'" class='whisper-out'>
-        <span class='who'>you</span> <span class='whispers'>whisper to</span> <span class='who'>{{ item.to }}</span> <span class='msg'>{{ item.msg }}</span>
+        <span class='whispers'>(whispering to)</span> <span class='who'>{{ item.to }}</span>: <span class='msg'>{{ item.msg }}</span>
       </div>
     </li>
   </ul>
 
-  <textarea [(ngModel)]=cmdText id="cmdline" placeholder='{{ cmdHint }}'></textarea>
+  <textarea [(ngModel)]=cmdText id="cmdline" placeholder='{{ cmdHint }}' ></textarea>
 </div>
