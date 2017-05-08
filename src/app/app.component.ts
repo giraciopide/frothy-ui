@@ -211,7 +211,7 @@ export class AppComponent {
     }
 
     private onPeopleFeed(payload: PeopleFeedPayload) {
-        let noticeText = payload.who + ' ' + payload.action + ' room ' + payload.room;
+        let noticeText = payload.who + ' ' + payload.userEvent + ' room ' + payload.room;
         this.addChatNoticeItem(noticeText);
     }
 

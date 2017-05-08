@@ -102,7 +102,7 @@ export interface RoomChatFeedPayload {
 
 export interface PeopleFeedPayload {
 	who: string;
-	action: string;
+	userEvent: string;
 	room: string;
 }
 
