@@ -41,6 +41,10 @@ $room-who-txt-color: $brand-color;
 		}
 
 		.room-talk {
+			.msg {
+				white-space: pre;
+			}
+
 			.room {
 				color: $room-room-txt-color;
 			}

@@ -82,7 +82,7 @@ export class ChatService {
         return this.backend.send({
             type: 'list-rooms-req',
             payload: {
-                filter: filter
+                filter: filter ? filter : "" // hack to avoid sending null filter
             }
         }).then((m: Message) => {
             let p = m.payload as ListRoomsResponsePayload;
