@@ -13,7 +13,7 @@ import { LoggingService, Logger } from './services/logging/logging.service';
 })
 export class AppComponent {
     //
-    // outbout props
+    // outbound props
     //
     cmdText: string = null;
     cmdHint: string = 'Type commands here i.e. /login someBadassNick';
@@ -161,7 +161,7 @@ export class AppComponent {
     private onLoginCmd(cmd: LoginCliCommand) {
         this.chat.login(cmd.nick)
         .then(() => {
-            this.addChatNoticeItem('you are now logged in as [' + cmd.nick + '] have fun, but respect other\'s feelings.');
+            this.addChatNoticeItem('Logged in as [' + cmd.nick + '] have fun.');
             this.cmdHint = 'join a room with \'/j room-name\', or list the available rooms with \'/rooms\'';
         })
         .catch((e: Error) => {
