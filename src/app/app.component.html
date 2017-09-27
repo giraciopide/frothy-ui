@@ -1,24 +1,33 @@
 <div class="container">
-  <ul id="chatpane">
-    <li class='welcome'>---===<[ ... welcome to undercover ... ]>===---</li>
-    <li *ngFor="let item of chatItems" class='chat-item'>
-      <div *ngIf="item.type == 'notice'" class='notice'>
-        <span class='notice'>notice:</span> <span class='notice-text'>{{ item.text }}</span>
-      </div>
+  <div class="row" id="top-panel">
+    <ul id="people-panel" class="col">
+      <li class="current-room">{{ currentRoom ? currentRoom : "no room" }}</li>
+      <li *ngFor="let name of currentRoomPeople" class='chat-item'>{{ name }}</li>
+    </ul>
 
-      <div *ngIf="item.type == 'room-talk'" class='room-talk'>
-        <span class='room'>{{ item.room }}</span>:<span class='who'>{{ item.who }}</span>: <span class='msg'>{{ item.msg }}</span>
-      </div>
+    <ul class="col" id="msg-panel" >
+        <li class='welcome'>---===<[ ... welcome to undercover ... ]>===---</li>
+        <li *ngFor="let item of chatItems" class='chat-item'>
+          <div *ngIf="item.type == 'notice'" class='notice'>
+            <span class='notice'>notice:</span> <span class='notice-text'>{{ item.text }}</span>
+          </div>
 
-      <div *ngIf="item.type == 'whisper-in'" class='whisper-in'>
-        <span class='who'>{{ item.from }}</span> <span class='whispers'>(whispers):</span> <span class='msg'>{{ item.msg }}</span>
-      </div>
+          <div *ngIf="item.type == 'room-talk'" class='room-talk'>
+            <span class='room'>{{ item.room }}</span>:<span class='who'>{{ item.who }}</span>: <span class='msg'>{{ item.msg }}</span>
+          </div>
 
-      <div *ngIf="item.type == 'whisper-out'" class='whisper-out'>
-        <span class='whispers'>(whispering to)</span> <span class='who'>{{ item.to }}</span>: <span class='msg'>{{ item.msg }}</span>
-      </div>
-    </li>
-  </ul>
+          <div *ngIf="item.type == 'whisper-in'" class='whisper-in'>
+            <span class='who'>{{ item.from }}</span> <span class='whispers'>(whispers):</span> <span class='msg'>{{ item.msg }}</span>
+          </div>
 
-  <textarea [(ngModel)]=cmdText id="cmdline" placeholder='{{ cmdHint }}' ></textarea>
+          <div *ngIf="item.type == 'whisper-out'" class='whisper-out'>
+            <span class='whispers'>(whispering to)</span> <span class='who'>{{ item.to }}</span>: <span class='msg'>{{ item.msg }}</span>
+          </div>
+        </li>
+      </ul>
+  </div> <!-- row -->
+
+  <div class="row">
+      <textarea class="col" [(ngModel)]=cmdText id="cmdline" placeholder='{{ cmdHint }}' ></textarea>
+  </div>
 </div>

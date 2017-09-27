@@ -21,6 +21,7 @@ export class AppComponent {
 
     private log: Logger;
     private currentRoom = null;
+    private currentRoomPeople = [];
 
     constructor(
         private cli: ChatCliService,
@@ -52,6 +53,7 @@ export class AppComponent {
     // 
     // Internal implementation
     // 
+    
     private isCtrlEnter(event: KeyboardEvent) {
         return (event.ctrlKey && event.key == 'Enter');
     }
@@ -120,7 +122,8 @@ export class AppComponent {
         .then((roomInfo: RoomInfo) => {
             this.addChatNoticeItem('you joined [' + roomInfo.room + ']. People in here: ' + roomInfo.people.join(', '));
             this.cmdHint = 'now talking in [' + cmd.room + ']';
-            this.currentRoom = cmd.room;   
+            this.currentRoom = cmd.room;
+            this.currentRoomPeople = roomInfo.people;
         }).catch((e: Error) => {
             this.addChatNoticeItem('could not join [' + cmd.room + ']: [' + e.message + ']');
         });
@@ -130,7 +133,8 @@ export class AppComponent {
         .then(() => {
             this.addChatNoticeItem('you left [' + cmd.room + ']');
             this.cmdHint = 'no current room for talk, /join on or /say room something';
-            this.currentRoom = null
+            this.currentRoom = null;
+            this.currentRoomPeople = [];
 
         }).catch((e: Error) => {
             this.addChatNoticeItem('could not leave [' + cmd.room + ']: [' + e.message + ']');
@@ -212,6 +216,29 @@ export class AppComponent {
 
     private onPeopleFeed(payload: PeopleFeedPayload) {
         let noticeText = payload.who + ' ' + payload.userEvent + ' room ' + payload.room;
+
+
+            switch (payload.userEvent) {
+                case "left-room":
+                    if (payload.room == this.currentRoom) {
+                        this.currentRoomPeople = this.currentRoomPeople.filter((name) => name != payload.who);
+                    }
+                    break;
+
+               case "joined-room":
+                    if (payload.room == this.currentRoom) {
+                        this.currentRoomPeople.push(payload.who);
+                        this.currentRoomPeople = this.currentRoomPeople.filter((item, pos) => {
+                            return this.currentRoomPeople.indexOf(item) == pos;
+                        });
+                    }
+                    break;    
+
+                default:
+                    // do nothing special
+                    break;
+            }
+
         this.addChatNoticeItem(noticeText);
     }
 

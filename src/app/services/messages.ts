@@ -100,9 +100,11 @@ export interface RoomChatFeedPayload {
     room: string;
 }
 
+export type UserEvent = "left-room" | "joined-room";
+
 export interface PeopleFeedPayload {
 	who: string;
-	userEvent: string;
+	userEvent: UserEvent;
 	room: string;
 }
 
